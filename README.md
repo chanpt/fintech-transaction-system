@@ -41,7 +41,7 @@ cd fintech-transaction-system/account-service
 docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=finuser -e POSTGRES_DB=fintech -p 5432:5432 -d postgres
 
 # Run the Spring Boot app
-./mvnw sprint-boot:run
+./mvnw spring-boot:run
 
 ```
 
