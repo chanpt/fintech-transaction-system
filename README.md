@@ -3,7 +3,7 @@ A backend microservices system to simulate financial transactions. Built with Ja
 
 ## 🚀 Key Faetures (Planned & In Progress)
 - [x] Account microservice (create & retrieve accounts)
-- [ ] Transaction microservice (transfer funds between accounts)
+- [x] Transaction microservice (transfer funds between accounts)
 - [ ] Balance microservice (track and update balances)
 - [ ] Notification microservice (send transaction alerts)
 - [ ] Kafka-based event-driven communication
@@ -45,6 +45,20 @@ docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=fi
 
 ```
 
+## 🛠️ How to Run (for Transaction Service)
+```bash
+# Clone the project
+git clone https://github.com/chanpt/fintech-transaction-system.git
+cd fintech-transaction-system/transaction-service
+
+# Start PostgreSQL (if you have Docker installed)
+docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=finuser -e POSTGRES_DB=fintech -p 5432:5432 -d postgres
+
+# Run the Spring Boot app
+./mvnw spring-boot:run
+
+```
+
 ## 📬 API Endpoints
 ### Account Microservice
 | Method | Endpoint          | Description          |
@@ -55,8 +69,17 @@ docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=fi
 | PUT    | `/accounts/{id}`  | Update account       |
 | DELETE | `/accounts/{id}`  | Delete account       |
 
+### Transaction Microservice
+| Method | Endpoint             | Description             |
+|--------|----------------------|-------------------------|
+| POST   | `/transactions`      | Create new transaction  |
+| GET    | `/transactions`      | Get all transaction     |
+| GET    | `/transactions/{id}` | Get transaction by ID   |
+
+## 🧪 Testing
+- Unit-tested using JUnit 5 + Mockito
 
 ## 📌 Status
 Currently building and documenting the system
-- Account service is working and deployed locally
+- Account service and transaction service are deployed 
 - More services and Kafka integration are planned
