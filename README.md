@@ -46,10 +46,15 @@ docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=fi
 ```
 
 ## 📬 API Endpoints
+### Account Microservice
 | Method | Endpoint          | Description          |
 |--------|-------------------|----------------------|
 | POST   | `/accounts`       | Create new account   |
+| GET    | `/accounts`       | Get all accounts     |
 | GET    | `/accounts/{id}`  | Get account details  |
+| PUT    | `/accounts/{id}`  | Update account       |
+| DELETE | `/accounts/{id}`  | Delete account       |
+
 
 ## 📌 Status
 Currently building and documenting the system
