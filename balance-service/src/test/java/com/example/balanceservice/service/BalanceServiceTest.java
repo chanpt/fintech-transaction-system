@@ -30,22 +30,22 @@ public class BalanceServiceTest {
 
     @Test
     void testGetBalanceByAccountId_found() {
-        Balance balance = new Balance(7L,1000.0);
+        Balance balance = new Balance("717",1000.0);
 
-        when(balanceRepository.findByAccountId(1L)).thenReturn(Optional.of(balance));
+        when(balanceRepository.findByAccountNumber("717")).thenReturn(Optional.of(balance));
 
-        Optional<Balance> result = balanceService.getBalanceByAccountId(1L);
+        Optional<Balance> result = balanceService.getBalanceByAccountNumber("717");
 
         assertTrue(result.isPresent());
         assertEquals(1000.0, result.get().getBalance());
-        verify(balanceRepository, times(1)).findByAccountId(1L);
+        verify(balanceRepository, times(1)).findByAccountNumber("717");
     }
 
     @Test
     void testGetBalanceByAccountId_notFound() {
-        when(balanceRepository.findByAccountId(1L)).thenReturn(Optional.empty());
+        when(balanceRepository.findByAccountNumber("717")).thenReturn(Optional.empty());
 
-        Optional<Balance> result = balanceService.getBalanceByAccountId(1L);
+        Optional<Balance> result = balanceService.getBalanceByAccountNumber("717");
         
         assertFalse(result.isPresent());
     }

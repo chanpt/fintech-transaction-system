@@ -16,8 +16,8 @@ public class BalanceController {
     private BalanceService balanceService;
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<Balance> getBalance(@PathVariable Long accountId) {
-        Optional<Balance> balance = balanceService.getBalanceByAccountId(accountId);
+    public ResponseEntity<Balance> getBalance(@PathVariable String accountNumber) {
+        Optional<Balance> balance = balanceService.getBalanceByAccountNumber(accountNumber);
         return balance.map(ResponseEntity::ok)
                       .orElse(ResponseEntity.notFound().build());
     }

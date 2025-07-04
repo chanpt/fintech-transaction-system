@@ -12,7 +12,7 @@ public class BalanceService {
     @Autowired
     private BalanceRepository balanceRepository;
 
-    public Optional<Balance> getBalanceByAccountId(Long accountId) {
-        return balanceRepository.findByAccountId(accountId);
+    public Optional<Balance> getBalanceByAccountNumber(String accountNumber) {
+        return balanceRepository.findByAccountNumber(accountNumber);
     }
 }

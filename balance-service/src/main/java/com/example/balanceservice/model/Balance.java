@@ -9,14 +9,14 @@ public class Balance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long accountId;
+    private String accountNumber;
     private Double balance;
 
     // Constructors
     public Balance() {};
 
-    public Balance(Long accountId, Double balance) {
-        this.accountId = accountId;
+    public Balance(String accountNumber, Double balance) {
+        this.accountNumber = accountNumber;
         this.balance = balance;
     }
 
@@ -25,19 +25,19 @@ public class Balance {
         return id;
     }
 
-    public Long getAccountId() {
-        return accountId;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    public void setAccountId() {
-        this.accountId = accountId;
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 
     public Double getBalance() {
         return balance;
     }
 
-    public void setBalance() {
+    public void setBalance(Double balance) {
         this.balance = balance;
     }
 
