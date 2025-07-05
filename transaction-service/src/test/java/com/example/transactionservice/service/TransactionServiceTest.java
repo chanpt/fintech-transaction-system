@@ -1,5 +1,7 @@
 package com.example.transactionservice.service;
 
+import com.example.transactionservice.kafka.event.BalanceUpdateEvent;
+import com.example.transactionservice.kafka.producer.BalanceUpdateProducer;
 import com.example.transactionservice.model.Transaction;
 import com.example.transactionservice.repository.TransactionRepository;
 
@@ -11,19 +13,23 @@ import java.lang.StackWalker.Option;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TransactionServiceTest {
 
+    private TransactionService transactionService;  
+
     @Mock
     private TransactionRepository transactionRepository;
 
-    @InjectMocks
-    private TransactionService transactionService;
+    @Mock
+    private BalanceUpdateProducer balanceUpdateProducer;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        transactionService = new TransactionService(transactionRepository, balanceUpdateProducer);
     }
 
     @Test
@@ -71,6 +77,7 @@ class TransactionServiceTest {
         assertEquals("E1141", result.getReceiverAccountNumber());
         assertEquals(512, result.getAmount());
         verify(transactionRepository, times(1)).save(trans);
+        verify(balanceUpdateProducer, times(2)).sendBalanceUpdate(any(BalanceUpdateEvent.class));
     }
 
     @Test

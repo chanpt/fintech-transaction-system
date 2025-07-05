@@ -1,5 +1,7 @@
 package com.example.transactionservice.model;
 
+import org.apache.kafka.common.protocol.types.Field.Str;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -33,7 +35,7 @@ public class Transaction {
         return senderAccountNumber;
     }
 
-    public void setSenderAccountNumber() {
+    public void setSenderAccountNumber(String senderAccountNumber) {
         this.senderAccountNumber = senderAccountNumber;
     }
 
@@ -41,15 +43,15 @@ public class Transaction {
         return receiverAccountNumber;
     }
 
-    public void setReceiverAccountNumber() {
-        this.senderAccountNumber = senderAccountNumber;
+    public void setReceiverAccountNumber(String receiverAccountNumber) {
+        this.receiverAccountNumber = receiverAccountNumber;
     }
 
     public Double getAmount() {
         return amount;
     }
 
-    public void setAmount() {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -57,7 +59,7 @@ public class Transaction {
         return description;
     }
 
-    public void setDescription() {
+    public void setDescription(String description) {
         this.description = description;
     }
 

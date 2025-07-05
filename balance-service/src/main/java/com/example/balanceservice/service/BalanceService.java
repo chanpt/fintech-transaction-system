@@ -15,4 +15,22 @@ public class BalanceService {
     public Optional<Balance> getBalanceByAccountNumber(String accountNumber) {
         return balanceRepository.findByAccountNumber(accountNumber);
     }
+
+    public void updateBalance(String accountNumber, Double amount, String type) {
+        Optional<Balance> balanceOpt = balanceRepository.findByAccountNumber(accountNumber);
+        Balance balance = balanceOpt.orElseGet(() -> {
+            Balance newBalance = new Balance();
+            newBalance.setAccountNumber(accountNumber);
+            newBalance.setBalance(0.0);
+            return newBalance;
+        });
+
+        if(type.equalsIgnoreCase("DEBIT")) {
+            balance.setBalance(balance.getBalance() - amount);
+        } else if(type.equalsIgnoreCase("CREDIT")) {
+            balance.setBalance(balance.getBalance() + amount);
+        }
+
+        balanceRepository.save(balance);
+    }
 }

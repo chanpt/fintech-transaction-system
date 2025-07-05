@@ -15,9 +15,10 @@ public class BalanceController {
     @Autowired 
     private BalanceService balanceService;
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/{accountNumber}")
     public ResponseEntity<Balance> getBalance(@PathVariable String accountNumber) {
         Optional<Balance> balance = balanceService.getBalanceByAccountNumber(accountNumber);
+        
         return balance.map(ResponseEntity::ok)
                       .orElse(ResponseEntity.notFound().build());
     }
