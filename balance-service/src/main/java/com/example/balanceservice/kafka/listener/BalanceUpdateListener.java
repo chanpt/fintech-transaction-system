@@ -16,7 +16,7 @@ public class BalanceUpdateListener {
     @KafkaListener(
         topics = "balance-update-topic", 
         groupId = "balance-service-group", 
-        containerFactory = "kafkaListenerContainerFactory"
+        containerFactory = "balanceUpdateKafkaListenerContainerFactory"
     )
     public void consume(@Payload BalanceUpdateEvent event) {
         balanceService.updateBalance(event.getAccountNumber(), event.getAmount(), event.getType());

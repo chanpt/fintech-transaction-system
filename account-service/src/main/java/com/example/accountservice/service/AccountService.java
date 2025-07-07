@@ -1,5 +1,7 @@
 package com.example.accountservice.service;
 
+import com.example.accountservice.kafka.event.BalanceCreateEvent;
+import com.example.accountservice.kafka.producer.BalanceCreateProducer;
 import com.example.accountservice.model.Account;
 import com.example.accountservice.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;   // automatically inject a dependency 
@@ -14,6 +16,9 @@ public class AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private BalanceCreateProducer balanceCreateProducer;
+
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
@@ -23,7 +28,12 @@ public class AccountService {
     }
 
     public Account createAccount(Account account) {
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+
+        // send Kafka event
+        BalanceCreateEvent event = new BalanceCreateEvent(savedAccount.getAccountNumber(), savedAccount.getBalance());
+        balanceCreateProducer.sendBalanceCreate(event);
+        return savedAccount;
     }
 
     public void deleteAccount(Long id) {

@@ -1,16 +1,18 @@
 package com.example.accountservice.service;
 
+import com.example.accountservice.kafka.event.BalanceCreateEvent;
+import com.example.accountservice.kafka.producer.BalanceCreateProducer;
 import com.example.accountservice.model.Account;
 import com.example.accountservice.repository.AccountRepository;
 
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.StackWalker.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +20,14 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
     
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private BalanceCreateProducer balanceCreateProducer;
 
     @InjectMocks
     private AccountService accountService;
@@ -34,13 +40,14 @@ class AccountServiceTest {
     @Test
     void testCreateAccount() {
         Account acc = new Account("A110", "John",1000.0);
-        when(accountRepository.save(acc)).thenReturn(acc);
+        when(accountRepository.save(any(Account.class))).thenReturn(acc);
 
         Account result = accountService.createAccount(acc);
 
         assertEquals("John", result.getAccountHolderName());
         assertEquals(1000, result.getBalance());
         verify(accountRepository, times(1)).save(acc);
+        verify(balanceCreateProducer, times(1)).sendBalanceCreate(any(BalanceCreateEvent.class));
     }
 
     @Test

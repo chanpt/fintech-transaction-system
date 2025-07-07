@@ -16,6 +16,15 @@ public class BalanceService {
         return balanceRepository.findByAccountNumber(accountNumber);
     }
 
+    public void createBalanceIfNotExists(String accountNumber, Double initialBalance) {
+        if (balanceRepository.findByAccountNumber(accountNumber).isEmpty()) {
+            Balance balance = new Balance();
+            balance.setAccountNumber(accountNumber);
+            balance.setBalance(initialBalance);
+            balanceRepository.save(balance);
+        }
+    }
+
     public void updateBalance(String accountNumber, Double amount, String type) {
         Optional<Balance> balanceOpt = balanceRepository.findByAccountNumber(accountNumber);
         Balance balance = balanceOpt.orElseGet(() -> {
