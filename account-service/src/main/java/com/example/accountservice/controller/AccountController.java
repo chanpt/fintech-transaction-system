@@ -1,13 +1,17 @@
 package com.example.accountservice.controller;
 
+import com.example.accountservice.controller.dto.AccountRequest;
+import com.example.accountservice.controller.dto.AccountResponse;
 import com.example.accountservice.model.Account;
 import com.example.accountservice.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/accounts")
@@ -18,9 +22,9 @@ public class AccountController {
 
     // Create new account
     @PostMapping
-    public ResponseEntity<Account> createAccount(@RequestBody Account account) {
-        Account createdAccount = accountService.createAccount(account);
-        return ResponseEntity.ok(createdAccount);
+    public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody AccountRequest request) {
+        AccountResponse response = accountService.createAccount(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     // Get all accounts

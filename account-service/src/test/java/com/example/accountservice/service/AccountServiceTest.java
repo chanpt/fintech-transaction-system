@@ -1,8 +1,11 @@
 package com.example.accountservice.service;
 
+import com.example.accountservice.controller.dto.AccountRequest;
+import com.example.accountservice.controller.dto.AccountResponse;
 import com.example.accountservice.kafka.event.BalanceCreateEvent;
 import com.example.accountservice.kafka.producer.BalanceCreateProducer;
 import com.example.accountservice.model.Account;
+import com.example.accountservice.model.AccountType;
 import com.example.accountservice.repository.AccountRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,21 +42,25 @@ class AccountServiceTest {
 
     @Test
     void testCreateAccount() {
-        Account acc = new Account("A110", "John",1000.0);
-        when(accountRepository.save(any(Account.class))).thenReturn(acc);
+        AccountRequest request = new AccountRequest("A001", "John", AccountType.BROKERAGE, 1000.0);
+        Account savedAccount = new Account("A001", "John", AccountType.BROKERAGE, 1000.0);
+        
+        when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
 
-        Account result = accountService.createAccount(acc);
+        AccountResponse result = accountService.createAccount(request);
 
         assertEquals("John", result.getAccountHolderName());
         assertEquals(1000, result.getBalance());
-        verify(accountRepository, times(1)).save(acc);
+        assertEquals(AccountType.BROKERAGE, result.getAccountType());
+        verify(accountRepository, times(1)).save(any(Account.class));
         verify(balanceCreateProducer, times(1)).sendBalanceCreate(any(BalanceCreateEvent.class));
     }
 
     @Test
     void testGetAllAccounts() {
-        Account acc1 = new Account("A001", "John", 1000.0);
-        Account acc2 = new Account("B110","Susan", 2000.0);
+        Account acc1 = new Account("A001", "John", AccountType.CLEARING, 1000.0);
+        Account acc2 = new Account("B110","Susan", AccountType.CUSTODIAN, 2000.0);
+        
         when(accountRepository.findAll()).thenReturn(Arrays.asList(acc1, acc2));
 
         List<Account> accounts = accountService.getAllAccounts();
@@ -64,7 +71,7 @@ class AccountServiceTest {
 
     @Test
     void testGetAccountById_found() {
-        Account acc = new Account("J717", "Jacky", 1717.0);
+        Account acc = new Account("J717", "Jacky", AccountType.OTHER, 1717.0);
         when(accountRepository.findById(1L)).thenReturn(Optional.of(acc));
 
         Optional<Account> result = accountService.getAccountById(1L);
@@ -94,9 +101,9 @@ class AccountServiceTest {
 
     @Test
     void testUpdateAccount_existing() {
-        Account existing = new Account("A001", "John", 1000.0);
+        Account existing = new Account("A001", "John", AccountType.BROKERAGE, 1000.0);
         existing.setId(1L);
-        Account updated = new Account("J717", "Jacky", 1717.0);
+        Account updated = new Account("J717", "Jacky", AccountType.OTHER, 1717.0);
 
         when(accountRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArgument(0));
@@ -112,7 +119,7 @@ class AccountServiceTest {
 
     @Test
     void testUpdateAccount_notExisting() {
-        Account updated = new Account("J717", "Jacky", 1717.0);
+        Account updated = new Account("J717", "Jacky", AccountType.CUSTODIAN, 1717.0);
         when(accountRepository.findById(1L)).thenReturn(Optional.empty());
         when(accountRepository.save(any(Account.class))).thenAnswer(i -> i.getArgument(0));
 

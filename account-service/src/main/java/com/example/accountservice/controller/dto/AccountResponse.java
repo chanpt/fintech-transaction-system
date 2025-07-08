@@ -1,39 +1,29 @@
-package com.example.accountservice.model;
+package com.example.accountservice.controller.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.example.accountservice.model.AccountType;
 
-// This class will be mapped to a table in the database
-@Entity
-public class Account {
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AccountResponse {
+    
     private Long id;
-
     private String accountNumber;
     private String accountHolderName;
+    private AccountType accountType;
     private Double balance;
 
-    @Enumerated(EnumType.STRING)
-    private AccountType accountType;
+public AccountResponse() {}
 
-    // Constructors
-    public Account() {}
+public AccountResponse(Long id, String accountNumber, String accountHolderName, AccountType accountType, Double balance) {
+    this.id = id;
+    this.accountNumber = accountNumber;
+    this.accountHolderName = accountHolderName;
+    this.accountType = accountType;
+    this.balance = balance;
+}
 
-    public Account(String accountNumber, String accountHolderName, AccountType accountType, Double balance) {
-        this.accountNumber = accountNumber;
-        this.accountHolderName = accountHolderName;
-        this.accountType = accountType;
-        this.balance = balance;
-    }
-
-    // Getters and setters
-    public Long getId() {
+public Long getId() {
         return id;
     }
 

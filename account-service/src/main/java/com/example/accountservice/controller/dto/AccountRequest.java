@@ -1,44 +1,32 @@
-package com.example.accountservice.model;
+package com.example.accountservice.controller.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.example.accountservice.model.AccountType;
 
-// This class will be mapped to a table in the database
-@Entity
-public class Account {
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class AccountRequest {
+    
+    @NotNull(message = "Account number is required")
+    @Size(min = 1, max = 50, message = "Account number must be between 1 and 50 characters")
     private String accountNumber;
-    private String accountHolderName;
-    private Double balance;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Account holder name is required")
+    @Size(min = 1, max = 100, message = "Account number must be between 1 and 100 characters")
+    private String accountHolderName;
+
+    @NotNull(message = "Account type is required")
     private AccountType accountType;
 
-    // Constructors
-    public Account() {}
+    private Double balance;
 
-    public Account(String accountNumber, String accountHolderName, AccountType accountType, Double balance) {
+    public AccountRequest() {}
+
+    public AccountRequest(String accountNumber, String accountHolderName, AccountType accountType, Double balance) {
         this.accountNumber = accountNumber;
         this.accountHolderName = accountHolderName;
         this.accountType = accountType;
         this.balance = balance;
-    }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getAccountNumber() {

@@ -1,8 +1,11 @@
 package com.example.accountservice.service;
 
+import com.example.accountservice.controller.dto.AccountRequest;
+import com.example.accountservice.controller.dto.AccountResponse;
 import com.example.accountservice.kafka.event.BalanceCreateEvent;
 import com.example.accountservice.kafka.producer.BalanceCreateProducer;
 import com.example.accountservice.model.Account;
+import com.example.accountservice.model.AccountType;
 import com.example.accountservice.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;   // automatically inject a dependency 
 import org.springframework.stereotype.Service;                   // Spring will manage the business logic service as a bean 
@@ -27,13 +30,30 @@ public class AccountService {
         return accountRepository.findById(id);
     }
 
-    public Account createAccount(Account account) {
+    public AccountResponse createAccount(AccountRequest request) {
+        Account account = new Account();
+        account.setAccountNumber(request.getAccountNumber());
+        account.setAccountHolderName(request.getAccountHolderName());
+        account.setAccountType(request.getAccountType() != null ? request.getAccountType() : AccountType.OTHER);
+        account.setBalance(request.getBalance() != null ? request.getBalance() : 0.0);
+
         Account savedAccount = accountRepository.save(account);
 
         // send Kafka event
         BalanceCreateEvent event = new BalanceCreateEvent(savedAccount.getAccountNumber(), savedAccount.getBalance());
         balanceCreateProducer.sendBalanceCreate(event);
-        return savedAccount;
+
+        return mapToResponse(savedAccount);
+    }
+
+    private AccountResponse mapToResponse(Account account) {
+        AccountResponse response = new AccountResponse();
+        response.setId(account.getId());
+        response.setAccountNumber(account.getAccountNumber());
+        response.setAccountHolderName(account.getAccountHolderName());
+        response.setAccountType(account.getAccountType());
+        response.setBalance(account.getBalance());
+        return response;
     }
 
     public void deleteAccount(Long id) {
