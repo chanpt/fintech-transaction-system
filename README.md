@@ -88,28 +88,6 @@ cd transaction-service
 ./mvnw spring-boot:run
 ```
 
-## 📬 API Endpoints
-### Account Microservice
-| Method | Endpoint          | Description          |
-|--------|-------------------|----------------------|
-| POST   | `/accounts`       | Create new account   |
-| GET    | `/accounts`       | Get all accounts     |
-| GET    | `/accounts/{id}`  | Get account details  |
-| PUT    | `/accounts/{id}`  | Update account       |
-| DELETE | `/accounts/{id}`  | Delete account       |
-
-### Transaction Microservice
-| Method | Endpoint             | Description             |
-|--------|----------------------|-------------------------|
-| POST   | `/transactions`      | Create new transaction  |
-| GET    | `/transactions`      | Get all transaction     |
-| GET    | `/transactions/{id}` | Get transaction by ID   |
-
-### Balance Microservice
-| Method | Endpoint                   | Description                  |
-|--------|----------------------------|------------------------------|
-| GET    | `/balance/{accountNumber}`  | Get balance by acount number |
-
 ## 🧪 Testing
 - Unit-tested using JUnit 5 + Mockito
 - Swagger UI / Postman
@@ -121,11 +99,11 @@ Currently building and documenting the system. The project is under active devel
 - `account-service`, `transaction-service`, and `balance-service` are deployed and operational
 - Balance is updated through Kafka-based event-driven communication after each transaction
 - `account-service` now supports post-trade account types (e.g., BROKERAGE, CLEARING, CUSTODIAN)
+- API documentation and OpenAPI (Swagger) integration
 
 ### 🔄 In Progress
 - Kafka event schemas and documentation
 - Expanded test coverage and sample API requests
-- API documentation and OpenAPI (Swagger) integration
 
 ### 🚧 Planned
 - `settlement-service` to simulate post-trade lifecycle (confirmations, cash movements)
