@@ -1,10 +1,18 @@
 package com.example.accountservice.controller.dto;
 
 import com.example.accountservice.model.AccountType;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+@JsonPropertyOrder({
+    "id",
+    "accountNumber",
+    "accountHolderName",
+    "balance",
+    "accountType"
+})
 public class AccountResponse {
     
     private Long id;
