@@ -80,6 +80,7 @@ Update an account.
 #### Request
 ```json
 {
+    "id": 1,
     "accountNumber": "J0717 Updated",
     "accountHolderName": "Jacky Updated",
     "balance": 1000,
@@ -159,7 +160,7 @@ Get transaction details by ID.
 #### Response `200 OK`
 ```json
 {
-     "id": 1,
+    "id": 1,
     "senderAccountNumber": "J0717",
     "receiverAccountNumber": "Y1207",
     "amount": 50,
