@@ -22,9 +22,10 @@ Balances remain managed within the account service to keep the architecture simp
 - Uses Kafka to publish transaction events
 
 ### 📬 Event-Based Architecture
-- Kafka topic: `balance-update-topic` for balance change events
+- Kafka topic: 
+  - `balance-update-topic` for balance change events
+  - `balance-create-topic` for balance create events
 - Future Kafka events: `account-created`, `trade-confirmed`, `settlement-completed`
-
 
 ## 🧱 Tech Stack
 - Java 17
@@ -35,8 +36,6 @@ Balances remain managed within the account service to keep the architecture simp
 - JUnit + Mockito (Unit Testing)
 - Maven (build tool)
 - Github Actions (optional)
-
-
 
 ## 📐 System Architecture 
 The system is designed using a microservices architecture. Each service is responsible for a specific business function and communicates with others through Apache Kafka. Each service also has its own database for data isolation and scalability. 
@@ -69,28 +68,29 @@ docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=fi
 docker compose up -d
 ```
 ```bash
-# Run the Spring Boot app
-# Run for account service
-cd account-service
-./mvnw spring-boot:run
-```
-
-
-```bash
-# Run for transaction service
-cd transaction-service
-./mvnw spring-boot:run
-```
-
-```bash
-# Run for balance service
-cd transaction-service
-./mvnw spring-boot:run
+# Run the Spring Boot app for individual services
+cd account-service && ./mvnw spring-boot:run
+cd transaction-service && ./mvnw spring-boot:run
+cd transaction-service && ./mvnw spring-boot:run
 ```
 
 ## 🧪 Testing
 - Unit-tested using JUnit 5 + Mockito
-- Swagger UI / Postman
+- Integration tests: Spring Boot Test + MockMvc + Embedded Kafka
+- API documentation: Swagger UI / Postman
+
+### Code coverage 
+JaCoCo is used to measure the test coverage.
+
+```bash
+# Run
+./mvnw clean verify
+```
+```bash
+# Open the coverage report
+open target/site/jacoco/index.html      # macOS
+xdg-open target/site/jacoco/index.html  # Linux
+```
 
 ## 📌 Status
 Currently building and documenting the system. The project is under active development with core services already functional.
@@ -99,13 +99,15 @@ Currently building and documenting the system. The project is under active devel
 - `account-service`, `transaction-service`, and `balance-service` are deployed and operational
 - Balance is updated through Kafka-based event-driven communication after each transaction
 - `account-service` now supports post-trade account types (e.g., BROKERAGE, CLEARING, CUSTODIAN)
-- API documentation and OpenAPI (Swagger) integration
+- API documentation integrated via Swagger/OpenAPI
+- Integration tests for services and controllers (MockMvc + Embedded Kafka)
+- JaCoCo test coverage reporting enabled for all microservices
 
 ### 🔄 In Progress
+- `position-service` for securities holdings per account based on executed transactions (e.g., BUY/SELL)
 - Kafka event schemas and documentation
-- Expanded test coverage and sample API requests
 
 ### 🚧 Planned
-- `settlement-service` to simulate post-trade lifecycle (confirmations, cash movements)
-- `position-service` for securities holdings per account
+- `settlement-service` to simulate post-trade lifecycle (confirmations, cash movements, settlement)
 - Kafka events for trade creation, settlement confirmation, and reconciliation
+- Expanded unit and integration test coverage 
