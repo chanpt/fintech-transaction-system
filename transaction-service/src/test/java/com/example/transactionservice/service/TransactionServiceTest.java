@@ -77,6 +77,52 @@ class TransactionServiceTest {
         assertEquals("E1141", result.getReceiverAccountNumber());
         assertEquals(512, result.getAmount());
         verify(transactionRepository, times(1)).save(trans);
+
+        ArgumentCaptor<BalanceUpdateEvent> captor = ArgumentCaptor.forClass(BalanceUpdateEvent.class);
+        verify(balanceUpdateProducer, times(2)).sendBalanceUpdate(captor.capture());
+        
+        var events = captor.getAllValues();
+
+        // Check both DEBIT and CREDIT events are present
+        boolean hasDebit = events.stream()
+            .anyMatch(e -> e.getAccountNumber().equals("J717") &&
+                           e.getAmount() == 512.0 &&
+                           "DEBIT".equalsIgnoreCase(String.valueOf(e.getType())));
+                           
+        boolean hasCredit = events.stream()
+        .anyMatch(e -> e.getAccountNumber().equals("E1141") &&
+                       e.getAmount() == 512.0 &&
+                       "CREDIT".equalsIgnoreCase(String.valueOf(e.getType())));
+                       
+        assertTrue(hasDebit, "Missing DEBIT event for sender");
+        assertTrue(hasCredit, "Missing CREDIT event for receiver");
+    }
+
+    @Test
+    void testCreateTransaction_dbSaveFails() {
+        Transaction trans = new Transaction("J717", "E1141", 512.0, "Transfer");
+
+        when(transactionRepository.save(any(Transaction.class))).thenThrow(new RuntimeException("Database error"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            transactionService.createTransaction(trans);
+        });
+
+        assertEquals("Database error", exception.getMessage());
+
+        verify(balanceUpdateProducer, never()).sendBalanceUpdate(any(BalanceUpdateEvent.class));
+    }
+
+    @Test
+    void testCreateTransaction_kafkaProducerFails() {
+        Transaction trans = new Transaction("J717", "E1141", 512.0, "Transfer");
+        when(transactionRepository.save(trans)).thenReturn(trans);
+
+        doThrow(new RuntimeException("Kafka down"))
+            .when(balanceUpdateProducer).sendBalanceUpdate(any(BalanceUpdateEvent.class));
+
+        assertDoesNotThrow(() -> {transactionService.createTransaction(trans);});
+
         verify(balanceUpdateProducer, times(2)).sendBalanceUpdate(any(BalanceUpdateEvent.class));
     }
 

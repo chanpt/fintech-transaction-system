@@ -3,6 +3,9 @@ package com.example.transactionservice.model;
 import org.apache.kafka.common.protocol.types.Field.Str;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Transaction {
@@ -11,9 +14,18 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Sender account number is required")
+    @Size(min = 1, max = 50)
     private String senderAccountNumber;
+
+    @NotNull(message = "Receiver account number is required")
+    @Size(min = 1, max = 50)
     private String receiverAccountNumber;
+
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be positive")
     private Double amount;
+    
     private String description;
 
     //Constructors

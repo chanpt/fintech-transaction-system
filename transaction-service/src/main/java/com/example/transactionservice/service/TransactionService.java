@@ -4,12 +4,13 @@ import com.example.transactionservice.kafka.event.BalanceUpdateEvent;
 import com.example.transactionservice.kafka.producer.BalanceUpdateProducer;
 import com.example.transactionservice.model.Transaction;
 import com.example.transactionservice.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class TransactionService {
     
@@ -39,7 +40,11 @@ public class TransactionService {
             savedTrans.getAmount(),
             "DEBIT"
         );
-        balanceUpdateProducer.sendBalanceUpdate(debitEvent);
+        try {
+            balanceUpdateProducer.sendBalanceUpdate(debitEvent);
+        } catch (Exception exception) {
+            log.error("Failed to send DEBIT event", exception);
+}
 
         // Send Kafka event - credit
         BalanceUpdateEvent creditEvent = new BalanceUpdateEvent(
@@ -47,7 +52,11 @@ public class TransactionService {
             savedTrans.getAmount(),
             "CREDIT"
         );
-        balanceUpdateProducer.sendBalanceUpdate(creditEvent);
+        try {
+            balanceUpdateProducer.sendBalanceUpdate(creditEvent);
+        } catch (Exception exception) {
+            log.error("Failed to send CREDIT event", exception);
+        }
         
         return savedTrans;
     }

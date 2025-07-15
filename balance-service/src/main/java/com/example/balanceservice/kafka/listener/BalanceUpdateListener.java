@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class BalanceUpdateListener {
     
@@ -18,7 +20,11 @@ public class BalanceUpdateListener {
         groupId = "balance-service-group", 
         containerFactory = "balanceUpdateKafkaListenerContainerFactory"
     )
-    public void consume(@Payload BalanceUpdateEvent event) {
+    public void handleBalanceUpdate(@Payload BalanceUpdateEvent event) {
+        if (event == null || event.getAccountNumber() == null || event.getAmount() == null || event.getType() == null) {
+            log.warn("Invalid BalanceUpdateEvent: {}", event);
+            return;
+        }
         balanceService.updateBalance(event.getAccountNumber(), event.getAmount(), event.getType());
     }
 

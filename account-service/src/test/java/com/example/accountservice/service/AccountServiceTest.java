@@ -11,6 +11,7 @@ import com.example.accountservice.repository.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -19,6 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import javax.management.RuntimeErrorException;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,7 +55,44 @@ class AccountServiceTest {
         assertEquals("John", result.getAccountHolderName());
         assertEquals(1000, result.getBalance());
         assertEquals(AccountType.BROKERAGE, result.getAccountType());
+
+        ArgumentCaptor<BalanceCreateEvent> eventCaptor = ArgumentCaptor.forClass(BalanceCreateEvent.class);
+        verify(balanceCreateProducer, times(1)).sendBalanceCreate(eventCaptor.capture());
+
+        BalanceCreateEvent capturedEvent = eventCaptor.getValue();
+        assertEquals("A001", capturedEvent.getAccountNumber());
+        assertEquals(1000.0, capturedEvent.getBalance());
+
         verify(accountRepository, times(1)).save(any(Account.class));
+    }
+
+    @Test
+    void testCreateAccount_dbSaveFails() {
+        AccountRequest request = new AccountRequest("A001", "John", AccountType.BROKERAGE, 1000.0);
+
+        when(accountRepository.save(any(Account.class))).thenThrow(new RuntimeException("Database error"));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            accountService.createAccount(request);
+        });
+
+        assertEquals("Database error", exception.getMessage());
+
+        verify(balanceCreateProducer, never()).sendBalanceCreate(any(BalanceCreateEvent.class));
+    }
+
+    @Test
+    void testCreateAccount_kafkaProducerFails() {
+        AccountRequest request = new AccountRequest("A001", "John", AccountType.BROKERAGE, 1000.0);
+        Account savedAccount = new Account("A001", "John", AccountType.BROKERAGE, 1000.0);
+        
+        when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
+
+        doThrow(new RuntimeException("Kafka error"))
+            .when(balanceCreateProducer).sendBalanceCreate(any(BalanceCreateEvent.class));
+
+        assertDoesNotThrow(() -> accountService.createAccount(request));
+
         verify(balanceCreateProducer, times(1)).sendBalanceCreate(any(BalanceCreateEvent.class));
     }
 

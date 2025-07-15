@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.mockito.*;
 
-import java.beans.Transient;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -29,7 +28,7 @@ public class BalanceServiceTest {
     }
 
     @Test
-    void testGetBalanceByAccountId_found() {
+    void testGetBalanceByAccountNumber_found() {
         Balance balance = new Balance("717",1000.0);
 
         when(balanceRepository.findByAccountNumber("717")).thenReturn(Optional.of(balance));
@@ -42,7 +41,7 @@ public class BalanceServiceTest {
     }
 
     @Test
-    void testGetBalanceByAccountId_notFound() {
+    void testGetBalanceByAccountNumber_notFound() {
         when(balanceRepository.findByAccountNumber("717")).thenReturn(Optional.empty());
 
         Optional<Balance> result = balanceService.getBalanceByAccountNumber("717");

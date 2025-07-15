@@ -9,10 +9,12 @@ import com.example.accountservice.model.AccountType;
 import com.example.accountservice.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;   // automatically inject a dependency 
 import org.springframework.stereotype.Service;                   // Spring will manage the business logic service as a bean 
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class AccountService {
 
@@ -31,6 +33,17 @@ public class AccountService {
     }
 
     public AccountResponse createAccount(AccountRequest request) {
+        //Validation
+        if (request.getAccountNumber() == null || request.getAccountNumber().isBlank()) {
+            throw new IllegalArgumentException("Account number is required");
+        }
+        if (request.getAccountHolderName() == null || request.getAccountHolderName().isBlank()) {
+            throw new IllegalArgumentException("Account holder name is required");
+        }
+        if (accountRepository.findByAccountNumber(request.getAccountNumber()).isPresent()) {
+            throw new IllegalArgumentException("Account number already exists: " + request.getAccountNumber());
+        }
+        
         Account account = new Account();
         account.setAccountNumber(request.getAccountNumber());
         account.setAccountHolderName(request.getAccountHolderName());
@@ -41,7 +54,12 @@ public class AccountService {
 
         // send Kafka event
         BalanceCreateEvent event = new BalanceCreateEvent(savedAccount.getAccountNumber(), savedAccount.getBalance());
-        balanceCreateProducer.sendBalanceCreate(event);
+
+        try {
+            balanceCreateProducer.sendBalanceCreate(event);
+        } catch (Exception exception) {
+            log.error("Failed to send BalanceCreateEvent for account: {}", savedAccount.getAccountNumber(), exception);
+        }
 
         return mapToResponse(savedAccount);
     }

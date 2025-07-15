@@ -8,8 +8,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +29,9 @@ public class TransactionController {
     @Operation(summary = "Get all transactions")
     @ApiResponse(responseCode = "200", description = "List of transactions retrieved successfully")
     @GetMapping
-    public List<Transaction> getAllTransactions() {
-        return transactionService.getAllTransactions();
+    public ResponseEntity<List<Transaction>> getAllTransactions() {
+        List<Transaction> transactions = transactionService.getAllTransactions();
+        return ResponseEntity.ok(transactions);
     }
 
     @Operation(summary = "Get transaction by ID")
@@ -52,11 +55,12 @@ public class TransactionController {
         @ApiResponse(responseCode = "400", description = "Invalid transaction data")
     })
     @PostMapping
-    public Transaction createTransaction(
+    public ResponseEntity<Transaction> createTransaction(
         @Parameter(description = "Transaction request payload", required = true)
-        @RequestBody Transaction transaction
+        @Valid @RequestBody Transaction transaction
     ) {
-        return transactionService.createTransaction(transaction);   
+        Transaction savedTransaction = transactionService.createTransaction(transaction);  
+        return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Delete transaction by ID")
