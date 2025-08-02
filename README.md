@@ -2,30 +2,23 @@
 
 ## Overview
 
-This is a backend microservices project simulating a basic FinTech transaction system.  
-Built using **Java**, **Spring Boot**, **Kafka**, **PostgreSQL**, and **Docker**, it demonstrates event-driven architecture and service separation.
+This is a microservices-based personal project designed to simulate core banking operations such as account management, transactions, and balance updates. The system is built using **Java**, **Spring Boot**, **Kafka**, **PostgreSQL**, and **Docker**.
 
-### 🔄 Recent Update
+## 🚀 Key Features 
+### ✅ Account Service
+- RESTful API to create, read, update, and delete bank accounts.
+- On account creation, emits a Kafka event to create an initial balance. 
 
-The system now includes support for **post-trade account types** (e.g., BROKERAGE, CUSTODIAN, CLEARING) as a foundational step toward modeling post-trade operations like settlement and reconciliation.  
-Balances remain managed within the account service to keep the architecture simple and maintainable.
+### 💸 Transaction Service
+- RESTful API to perform debit/credit transactions.
+- Validates account existence and balance before processing.
+- Publishes Kafka events for balance updates. 
 
-## 🚀 Key Faetures 
-### ✅ Account Management
-- Create and manage accounts
-- Support for post-trade `accountType` (e.g., `BROKERAGE`, `CLEARING`, `CUSTODIAN`)
-- Each account includes a `balance` field for simplicity
-
-### 💸 Transactions
-- Create transactions with sender and receiver accounts
-- Deduct and credit balances accordingly
-- Uses Kafka to publish transaction events
-
-### 📬 Event-Based Architecture
-- Kafka topic: 
-  - `balance-update-topic` for balance change events
-  - `balance-create-topic` for balance create events
-- Future Kafka events: `account-created`, `trade-confirmed`, `settlement-completed`
+### 📬 Balance Service
+- Listens to Kafka events: 
+  - `BalanceCreateEvent` to initialize account balances. 
+  - `BalanceUpdateEvent` to update balances upon transaction events. 
+- Handles DEBIT and CREDIT operations with persistent storage.
 
 ## 🧱 Tech Stack
 - Java 17
@@ -33,23 +26,23 @@ Balances remain managed within the account service to keep the architecture simp
 - PostgreSQL (relational database)
 - Apache Kafka (event streaming)
 - Docker & Docker Compose (containerization)
-- JUnit + Mockito (Unit Testing)
+- JUnit + Mockito (unit testing)
 - Maven (build tool)
-- Github Actions (optional)
+- GitHub Actions (optional)
 
 ## 📐 System Architecture 
 The system is designed using a microservices architecture. Each service is responsible for a specific business function and communicates with others through Apache Kafka. Each service also has its own database for data isolation and scalability. 
 
 ### Key Components:
-- **Account Service** – Manages account creation and retrieval. Now supports `accountType` (BROKERAGE, CUSTODIAN, etc.).
+- **Account Service** – Manages account creation and retrieval. 
 - **Transaction Service** – Handles fund transfers between accounts and publishes transaction events.
-- **Balance Service** – Listens for events and adjusts user balances. (WIP for decoupled balance tracking)
+- **Balance Service** – Listens for events and adjusts user balances. 
 - **Kafka Broker** – Enables asynchronous, event-driven communication between services.
 - **PostgreSQL** – Each microservice has its own PostgreSQL instance for data persistence.
   
 ## 🔧 Prerequisites
 
-Make sure the following tools are installed on your machine:
+Ensure the following tools are installed on your machine:
 
 - [Java 17+](https://adoptium.net/)
 - [Maven](https://maven.apache.org/)
@@ -64,14 +57,14 @@ cd fintech-transaction-system
 # Start PostgreSQL (if you have Docker installed)
 docker run --name fintech-postgres -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=finuser -e POSTGRES_DB=fintech -p 5432:5432 -d postgres
 
-# Run Everything via Docker Compose
+# Run everything via Docker Compose
 docker compose up -d
 ```
 ```bash
 # Run the Spring Boot app for individual services
 cd account-service && ./mvnw spring-boot:run
 cd transaction-service && ./mvnw spring-boot:run
-cd transaction-service && ./mvnw spring-boot:run
+cd balance-service && ./mvnw spring-boot:run
 ```
 
 ## 🧪 Testing
@@ -92,22 +85,18 @@ open target/site/jacoco/index.html      # macOS
 xdg-open target/site/jacoco/index.html  # Linux
 ```
 
-## 📌 Status
-Currently building and documenting the system. The project is under active development with core services already functional.
-
 ### ✅ Implemented
 - `account-service`, `transaction-service`, and `balance-service` are deployed and operational
-- Balance is updated through Kafka-based event-driven communication after each transaction
+- Balances are updated through Kafka-based event-driven communication after each transaction
 - `account-service` now supports post-trade account types (e.g., BROKERAGE, CLEARING, CUSTODIAN)
 - API documentation integrated via Swagger/OpenAPI
 - Integration tests for services and controllers (MockMvc + Embedded Kafka)
 - JaCoCo test coverage reporting enabled for all microservices
 
-### 🔄 In Progress
-- `position-service` for securities holdings per account based on executed transactions (e.g., BUY/SELL)
-- Kafka event schemas and documentation
-
-### 🚧 Planned
-- `settlement-service` to simulate post-trade lifecycle (confirmations, cash movements, settlement)
-- Kafka events for trade creation, settlement confirmation, and reconciliation
-- Expanded unit and integration test coverage 
+### 🛠️ Future Improvements (Optional Ideas)
+Although development is currently frozen, the following improvements were previously considered and may be revisited:
+- Position Service: Track security holdings or assets linked to accounts.
+- Settlement Service: Simulate clearing and settlement of transactions.
+- Authentication & Authorization: Implement user authentication.
+- CI/CD Pipeline: Automate tests and deployments using Github Actions or Jenkins.
+- Expanded unit and integration test coverage. 
